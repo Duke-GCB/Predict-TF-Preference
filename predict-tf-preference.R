@@ -16,6 +16,14 @@ extract_scores <- function(bed_file) {
   return(bed_data[, PREDICTION_COLUMN])
 }
 
+write_preferences <- function(prefs, template_bedfile, output_file) {
+  # Writes out a BED file with preferences. Starts by reading the template_bedfile
+  # and replaces the values in PREDICTION_COLUMN with prefs
+  bed_data <- read.table(template_bedfile, header=FALSE, stringsAsFactors = FALSE)
+  bed_data[, PREDICTION_COLUMN] = prefs
+  write.table(bed_data, output_file, quote = F, col.names = F, row.names = F)
+}
+
 load_fit_data <- function(family) {
   # hard-coding the column names for the PBM data here
   data = switch (family,
@@ -29,24 +37,27 @@ load_fit_data <- function(family) {
 
 args = commandArgs(trailingOnly = TRUE)
 
-if (length(args) != 6) {
-  stop("Usage: predict-tf-preference.R tf1.bed tf2.bed family tf1_x tf1_y tf2_y")
+if (length(args) != 7) {
+  stop("Usage: predict-tf-preference.R tf1.bed tf2.bed output.bed family tf1_x tf1_y tf2_y")
 }
 
 # read the scores - arguments 1 and 2 have the bed files
 tf_predictions_1_bed_file <- args[1]
 tf_predictions_2_bed_file <- args[2]
-# argument 3 has the family, which identifies the PBMData and its columns
-family <- args[3]
+# Output file name in argument 3
+output_preferences_bed_file <- args[3] # output bed file
 
-# arguments 4, 5, 6 have the labels tf1_x, tf1_y, and tf2_y
-labels.tf1_x <- args[4]  ## Used in Replicate estimate (VarRep) and TF pair estimate (ClassTF)
-labels.tf1_y <- args[5]  ## Used in Replicate estimate
-labels.tf2_y <- args[6]  ## Used in TF pair estimate
+# argument 4 has the family, which identifies the PBMData and its columns
+family <- args[4]
+
+# arguments for labels tf1_x, tf1_y, and tf2_y
+labels.tf1_x <- args[5]  ## Used in Replicate estimate (VarRep) and TF pair estimate (ClassTF)
+labels.tf1_y <- args[6]  ## Used in Replicate estimate
+labels.tf2_y <- args[7]  ## Used in TF pair estimate
 
 scores.x = extract_scores(tf_predictions_1_bed_file)
 scores.y = extract_scores(tf_predictions_2_bed_file)
 data_fit = load_fit_data(family)
 
-result = dan_predTF(scores, labels, data_fit)
-print(result)
+prefs = dan_predTF(scores, labels, data_fit)
+write_preferences(prefs, tf_predictions_1_bed_file, output_preferences_bed_file)

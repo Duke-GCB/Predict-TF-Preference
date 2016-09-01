@@ -5,6 +5,7 @@
 ./predict-tf-preference.R \
   ~/Data/tf-dna-predictions/hardac-results/hg19-E2F1-chr1-CCGC-predictions.bed \
   ~/Data/tf-dna-predictions/hardac-results/hg19-E2F4-chr1-CCGC-predictions.bed \
+  output.bed \
   e2f \
   e2f1_250nM \
   e2f1_200nM \
