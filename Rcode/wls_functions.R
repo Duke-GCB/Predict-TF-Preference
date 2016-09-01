@@ -212,14 +212,13 @@ classTF <- function(tf1_x, tf2_y, t, sigma, plot = F,
 # information, remove first before assigning preference
 #<0 = preferred by TF1, 0 = no significant preference, >0 = preferred by TF2
 
-class_predTF <- function(tf1_x, tf2_y, Pred_matrix_tf1, Pred_matrix_tf2, t, sigma, plot = F, 
+class_predTF <- function(tf1_x, tf2_y, scores_tf1, scores_tf2, t, sigma, plot = F, 
                          xlab = "tf1_x", ylab = "tf2_y", level = 0.99){
-  # Convert the Pred_matrix to make easy for assigning preference
-  Pred_genomic_coord = Pred_matrix_tf1[,1:3] # Keep info about genomic coordinates predicted
-  Pred_matrix_tf1 = as.matrix(Pred_matrix_tf1[,-(1:3)]) # Remove first 3 columns with information of genomic coordinates
-  Pred_matrix_tf2 = as.matrix(Pred_matrix_tf2[,-(1:3)])
-  n_pred_pos = length(Pred_matrix_tf1[1,])
-  Pred_matrix_combined = data.frame(x = as.vector(t(Pred_matrix_tf1),mode='numeric'), y = as.vector(t(Pred_matrix_tf2),mode='numeric')) # Combine the predictions into one data frame
+  if (length(scores_tf1) != length(scores_tf2)) {
+    stop("scores vectors must be same length")
+  }
+  n_pred_pos = length(scores_tf1)
+  Pred_matrix_combined = data.frame(x = scores_tf1, y = scores_tf2) # Combine the predictions into one data frame
   n_line = nrow(Pred_matrix_combined)
   
   data_fit <- data.frame(x = tf1_x, y = tf2_y) #occupancy data for paralogous TFs measured from gcPBM to fit
@@ -329,12 +328,13 @@ class_predTF <- function(tf1_x, tf2_y, Pred_matrix_tf1, Pred_matrix_tf2, t, sigm
     }
   }
   # Convert the prediction vector into prediction matrix matching each position of genomic regions
-  Pred_matrix = matrix(pref_score,ncol=n_pred_pos,byrow = T)
-  Pred_matrix = round(Pred_matrix,2) # Define decimal points 
-  Pred_matrix = data.frame(Pred_genomic_coord,Pred_matrix) # add genomic coordinate info
   
+  rounded_pref_scores = round(pref_score, 2)
+
   #Plot the two weighted regression models with prediction bands
   if(plot == T){
+    Pred_matrix = matrix(pref_score,ncol=n_pred_pos,byrow = T)
+    Pred_matrix = round(Pred_matrix,2) # Define decimal points 
     plot(Pred_matrix_combined, col = rgb(0,0,0,0.1), xlab = xlab, ylab = ylab,cex=.3)
     lines(sort(data_fit$x), wls1_fit[order(data_fit$x)], lwd = 2, col = 2)
     lines(sort(data_fit$x), wls1_l[order(data_fit$x)], lty = 2, col = 2)
@@ -353,5 +353,5 @@ class_predTF <- function(tf1_x, tf2_y, Pred_matrix_tf1, Pred_matrix_tf2, t, sigm
     }
   }
   
-  return(Pred_matrix) #returns pref as a data frame
+  return(rounded_pref_scores) #returns pref as a data frame
 }
