@@ -29,6 +29,10 @@ load_fit_data <- function(family) {
 
 args = commandArgs(trailingOnly = TRUE)
 
+if (length(args) != 6) {
+  stop("Usage: predict-tf-preference.R tf1.bed tf2.bed family tf1_x tf1_y tf2_y")
+}
+
 # read the scores - arguments 1 and 2 have the bed files
 tf_predictions_1_bed_file <- args[1]
 tf_predictions_2_bed_file <- args[2]
