@@ -1,6 +1,15 @@
 #!/usr/bin/env Rscript
 # Load the WLS functions
-source("Rcode/wls_functions.R")
+
+# Hack to source wls_functions.R relatively
+# This is necessary because cwl changes the Docker workdir
+# via http://stackoverflow.com/questions/1815606/rscript-determine-path-of-the-executing-script
+initial.options <- commandArgs(trailingOnly = FALSE)
+file.arg.name <- "--file="
+script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
+script.basename <- dirname(script.name)
+other.name <- paste(sep="/", script.basename, "Rcode/wls_functions.R")
+source(other.name)
 
 PREDICTION_COLUMN = 4 # 1-indexed column in the bed file where the fractional (0.0 - 1.0) scores are
 
