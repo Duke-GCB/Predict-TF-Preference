@@ -36,10 +36,10 @@ write_preferences <- function(prefs, template_bedfile, output_file) {
 load_fit_data <- function(family) {
   # hard-coding the column names for the PBM data here
   data = switch (family,
-    ets = read.table("PBMdata/Combined_Ets1_100nM_Elk1_100nM_50nM_Gabpa_100nM_Bound_filtered_normalized.txt",col.names=c("seq","ets1_100nM","elk1_100nM","elk1_50nM","gabpa_100nM")),
-    e2f = read.table("PBMdata/Combined_E2f1_250nM_200nM_E2f3_250nM_E2f4_500nM_800nM_Bound_filtered_normalized.txt",col.names = c("seq","e2f1_250nM","e2f1_200nM","e2f3_250nM","e2f4_500nM","e2f4_800nM")),
-    bHLH = read.table("PBMdata/Combined_Max_Myc_Mad_MadL_Bound_filtered_normalized.txt",col.names = c("seq","max","myc","mad","madL")),
-    runx = read.table("PBMdata/Combined_Runx1_10nM_50nM_Runx2_10nM_Bound_filtered_normalized.txt",col.names = c("seq","runx1_10nM","runx1_50nM","runx2_10nM"))
+    ets = read.table(paste(sep="/", script.basename,"PBMdata/Combined_Ets1_100nM_Elk1_100nM_50nM_Gabpa_100nM_Bound_filtered_normalized.txt"),col.names=c("seq","ets1_100nM","elk1_100nM","elk1_50nM","gabpa_100nM")),
+    e2f = read.table(paste(sep="/", script.basename,"PBMdata/Combined_E2f1_250nM_200nM_E2f3_250nM_E2f4_500nM_800nM_Bound_filtered_normalized.txt"),col.names = c("seq","e2f1_250nM","e2f1_200nM","e2f3_250nM","e2f4_500nM","e2f4_800nM")),
+    bHLH = read.table(paste(sep="/", script.basename,"PBMdata/Combined_Max_Myc_Mad_MadL_Bound_filtered_normalized.txt"),col.names = c("seq","max","myc","mad","madL")),
+    runx = read.table(paste(sep="/", script.basename,"PBMdata/Combined_Runx1_10nM_50nM_Runx2_10nM_Bound_filtered_normalized.txt"),col.names = c("seq","runx1_10nM","runx1_50nM","runx2_10nM"))
   )
   return(data)
 }
