@@ -20,9 +20,20 @@ lab.tf2_y <- "ets1_100nM"  ## Used in TF pair estimate
 # E2F family, between E2f1 and E2f4
 data_e2f = read.table("Combined_E2f1_250nM_200nM_E2f3_250nM_E2f4_500nM_800nM_Bound_filtered_normalized.txt",col.names = c("seq","e2f1_250nM","e2f1_200nM","e2f3_250nM","e2f4_500nM","e2f4_800nM"))
 data_fit = data_e2f
+### Compare E2f1 vs E2f4
 lab.tf1_x = "e2f1_250nM"  ## Used in Replicate estimate (VarRep) and TF pair estimate (ClassTF)
 lab.tf1_y = "e2f1_200nM"  ## Used in Replicate estimate
 lab.tf2_y = "e2f4_500nM"  ## Used in TF pair estimate
+### Compare E2f1 vs E2f3
+lab.tf0_x = "e2f4_500nM"  ## TF0 use as within experiment replicate
+lab.tf0_y = "e2f4_800nM"
+lab.tf1_x = "e2f1_250nM"
+lab.tf2_y = "e2f3_250nM"
+res_varRep <- varRep(data_fit[,lab.tf0_x], data_fit[,lab.tf0_y], plot = T,
+                     xlab = lab.tf0_x, ylab = lab.tf0_y)
+res_pref <- classTF(data_fit[,lab.tf1_x], data_fit[,lab.tf2_y], plot = T, 
+                    xlab = lab.tf1_x, ylab = lab.tf2_y,
+                    t = res_varRep$t, sigma = res_varRep$sigma)
 
 # bHLH family, between Mad and Myc
 data_bHLH = read.table("Combined_Max_Myc_Mad_MadL_Bound_filtered_normalized.txt",col.names = c("seq","max","myc","mad","madL"))
@@ -32,7 +43,7 @@ lab.tf1_y = "madL"
 lab.tf2_y = "myc"
 
 # Runx family, between Runx1 and Runx2
-data_runx = read.table("Combined_Runx1_10nM_50nM_Runx2_10nM_Bound_filtered_normalized.txt",col.names = c("seq","runx1_10nM","runx1_50nM","runx2_10nM"))
+data_runx = read.table("Combined_Runx1_10nM_50nM_Runx2_10nM_50nM_Bound_filtered_normalized_V2.txt",col.names = c("name","seq","runx1_10nM","runx1_50nM","runx2_10nM","runx2_50nM"))
 data_fit = data_runx
 lab.tf1_x = "runx1_10nM"
 lab.tf1_y = "runx1_50nM"
@@ -67,9 +78,14 @@ plotvar2 = pref_tf2$pref
 plotclr2 = rev(brewer.pal(9,"Blues"))
 class2 = classIntervals(plotvar2,9,syle="quantile")
 colcode2 = findColours(class2,plotclr2)
-plot(pref_tf1[,lab.tf1_x],pref_tf1[,lab.tf2_y],cex=.3,pch=16,col=colcode1,xlim=c(0,1),ylim=c(0,1))
+pdf(paste0(lab.tf1_x,"_vs_",lab.tf2_y,".pdf"),width = 5, height = 5)
+par(mar=c(5,5,5,5))
+plot(pref_tf1[,lab.tf1_x],pref_tf1[,lab.tf2_y],xlab=lab.tf1_x, ylab=lab.tf2_y,cex=.3,pch=16,col=colcode1,xlim=c(0,1),ylim=c(0,1),xaxt="n",yaxt="n")
+axis(1,xaxp = c(0, 1, 2),cex.axis=1.5)
+axis(2,yaxp = c(0, 1, 2),cex.axis=1.5)
 points(data_output[which(data_output$pref==0),lab.tf1_x],data_output[which(data_output$pref==0),lab.tf2_y],cex=.3,pch=16,col="plum1")
 points(pref_tf2[,lab.tf1_x],pref_tf2[,lab.tf2_y],cex=.3,pch=16,col=colcode2)
+dev.off()
 
 ################################################################
 # Part 2. Identify differentially preferred sites for genomic prediction matrix
@@ -91,13 +107,13 @@ pred_matrix_pref = class_predTF(data_fit[,lab.tf1_x],data_fit[,lab.tf2_y],Pred_m
 
 #### An additional function to check if preferred sites are also above NegCtrl range for the TF preferred
 verify_neg = function(matrix_pref,matrix_occ1,matrix_occ2,neg1=0.2244,neg2=0.2128){ #neg1:Elk1 neg2:Ets1
-  matrix_occ1 = matrix_occ1[,-(1:3)]
-  matrix_occ2 = matrix_occ2[,-(1:3)]
+#  matrix_occ1 = matrix_occ1[,-(1:3)]
+#  matrix_occ2 = matrix_occ2[,-(1:3)]
   for(i in 1:length(matrix_pref[,1])){
-    for(j in 1:length(matrix_pref[1,])){
-      if(matrix_pref[i,j] == -1 && matrix_occ1[i,j] <= neg1){
+    for(j in 2:length(matrix_pref[1,])){
+      if(matrix_pref[i,j] > 0 && matrix_occ1[i,j] <= neg1){ ## site[i,j] is TF1 preferred but with TF occ < neg1
         matrix_pref[i,j] = 0
-      }else if(matrix_pref[i,j] == 1 && matrix_occ2[i,j] <= neg2){
+      }else if(matrix_pref[i,j] < 0 && matrix_occ2[i,j] <= neg2){
         matrix_pref[i,j] = 0
       }
     }
@@ -105,5 +121,6 @@ verify_neg = function(matrix_pref,matrix_occ1,matrix_occ2,neg1=0.2244,neg2=0.212
   return(matrix_pref)
 }
 
+pred_matrix_pref_negup = verify_neg(pred_matrix_pref,Pred_matrix_tf1,Pred_matrix_tf2)
 Pred_elk1_allpeak_pref_negup = verify_neg(Pred_elk1_allpeak_pref,Pred_elk1_allpeak_elk1,Pred_elk1_allpeak_ets1) ## Test Elk1 ChIP-seq peak regions
 Pred_ets1_allpeak_pref_negup = verify_neg(Pred_ets1_allpeak_pref,Pred_ets1_allpeak_elk1,Pred_ets1_allpeak_ets1) ## Test Ets1 ChIP-seq peak regions
