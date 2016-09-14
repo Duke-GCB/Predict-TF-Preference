@@ -9,21 +9,25 @@ def filter_threshold(tf1_scores, tf2_scores, pref_scores, tf1_threshold, tf2_thr
     Filters scores in a preferences bed file by returning nonzero scores only
     where the source binding probability for the TF is above that TF's threshold
     above the threshold
-    :param tf1_scores: list of floats containing the scores for TF1
-    :param tf2_scores: list of floats containing the scores for TF2
-    :param pref_scores: list of floats containing the preference values for TF1 vs TF2
+    :param tf1_scores: list of strings containing the scores for TF1
+    :param tf2_scores: list of strings containing the scores for TF2
+    :param pref_scores: list of strings containing the preference values for TF1 vs TF2
     :param tf1_threshold: NegCtrl threshold for TF1 scores
     :param tf2_threshold: NegCtrl threshold for TF2 scores
     :return: A list of preference scores, filtered by the above
     """
+    # Scores are preserved in original string format to avoid altering
+    # the text (e.g. 0->0.0) unless we have a real change
     output_pref_scores = list(pref_scores)
     for i in range(len(tf1_scores)):
-        tf1_score, tf2_score, pref_score = tf1_scores[i], tf2_scores[i], pref_scores[i]
-        if pref_score > 0.0: # favors tf_1
+        tf1_score, tf2_score, pref_score = float(tf1_scores[i]), float(tf2_scores[i]), float(pref_scores[i])
+        if pref_score == 0.0:
+            pass # Avoid changing things
+        elif pref_score > 0.0: # favors tf_1
             # if the source TF score is below the cutoff, zero this score
-            if tf1_score < tf1_threshold: output_pref_scores[i] = 0.0
+            if tf1_score < tf1_threshold: output_pref_scores[i] = '0'
         else: # favors tf_2
-            if tf2_score < tf2_threshold: output_pref_scores[i] = 0.0
+            if tf2_score < tf2_threshold: output_pref_scores[i] = '0'
     return output_pref_scores
 
 
@@ -33,12 +37,12 @@ def read_scores(input, delimiter, score_index=3):
     :param input: Input file object
     :param delimiter: delimiter character, e.g. tab, comma, or space
     :param score_index: column index of the score value
-    :return: A list of floats
+    :return: A list of scores (still strings)
     """
     scores = list()
     reader = csv.reader(input, delimiter=delimiter)
     for row in reader:
-        scores.append(float(row[score_index]))
+        scores.append(row[score_index])
     return scores
 
 def write_scores(scores, output, template, delimiter, score_index=3):
