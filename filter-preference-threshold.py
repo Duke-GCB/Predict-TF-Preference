@@ -5,6 +5,17 @@ import csv
 import sys
 
 def filter_threshold(tf1_scores, tf2_scores, pref_scores, tf1_threshold, tf2_threshold):
+    """
+    Filters scores in a preferences bed file by returning nonzero scores only
+    where the source binding probability for the TF is above that TF's threshold
+    above the threshold
+    :param tf1_scores: list of floats containing the scores for TF1
+    :param tf2_scores: list of floats containing the scores for TF2
+    :param pref_scores: list of floats containing the preference values for TF1 vs TF2
+    :param tf1_threshold: NegCtrl threshold for TF1 scores
+    :param tf2_threshold: NegCtrl threshold for TF2 scores
+    :return: A list of preference scores, filtered by the above
+    """
     output_pref_scores = list(pref_scores)
     for i in range(len(tf1_scores)):
         tf1_score, tf2_score, pref_score = tf1_scores[i], tf2_scores[i], pref_scores[i]
@@ -17,6 +28,13 @@ def filter_threshold(tf1_scores, tf2_scores, pref_scores, tf1_threshold, tf2_thr
 
 
 def read_scores(input, delimiter, score_index=3):
+    """
+    Reads the scores from a bed file into a list of floats
+    :param input: Input file object
+    :param delimiter: delimiter character, e.g. tab, comma, or space
+    :param score_index: column index of the score value
+    :return: A list of floats
+    """
     scores = list()
     reader = csv.reader(input, delimiter=delimiter)
     for row in reader:
@@ -24,6 +42,14 @@ def read_scores(input, delimiter, score_index=3):
     return scores
 
 def write_scores(scores, output, template, delimiter, score_index=3):
+    """
+    Writes the supplied scores to an output file
+    :param scores: The scores to write into the file - list of floats
+    :param output: The output file object, must be opened for writing
+    :param template: The base BED file to use for writing scores. Must be opened for reading
+    :param delimiter: delimiter character, e.g. tab, comma, or space
+    :param score_index: column index of the score value
+    """
     # Make sure we're reading from the beginning of the template output file
     template.seek(0)
     reader = csv.reader(template, delimiter=delimiter)
