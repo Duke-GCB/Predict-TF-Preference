@@ -4,6 +4,7 @@ R scripts to predict preferences between two TFs using data from predict-tf-bind
 ## Dependencies
 
 1. R (Included Dockerfile provides r-base, which is adequate)
+2. Python 2.7 for filtering NegCtrl (Included Dockerfile installs python 2.7)
 
 ## Calculating Preference scores
 
