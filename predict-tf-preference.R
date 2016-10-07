@@ -42,9 +42,14 @@ load_fit_data <- function(family) {
 family_from_tfs <- function(tf1, tf2) {
   family = switch(paste(tf1, tf2),
                   "Elk1 Ets1" = "ETS",
+                  "Elk1 Gabpa" = "ETS",
+                  "Ets1 Gabpa" = "ETS",
                   "E2f1 E2f4" = "E2F",
                   "E2f1 E2f3" = "E2F",
+                  "E2f3 E2f4" = "E2F",
                   "Mad1 c-Myc" = "bHLH",
+                  "Mad1 Max" = "bHLH",
+                  "Max c-Myc" = "bHLH",
                   "Runx1 Runx2" = "RUNX")
   return(family)
 }
@@ -52,9 +57,14 @@ family_from_tfs <- function(tf1, tf2) {
 labels_from_tfs <- function(tf1, tf2) {
   labels = switch(paste(tf1,tf2),
                   "Elk1 Ets1" = list(tf1_x="elk1_100nM", tf1_y="elk1_50nM", tf2_y="ets1_100nM"),
+                  "Elk1 Gabpa" = list(tf1_x="elk1_100nM", tf1_y="elk1_50nM", tf2_y="gabpa_100nM"),
+                  "Ets1 Gabpa" = list(tf0_x="elk1_100nM", tf0_y="elk1_50nM", tf1_x="ets1_100nM", tf2_y="gabpa_100nM"),
                   "E2f1 E2f4" = list(tf1_x="e2f1_250nM", tf1_y="e2f1_200nM", tf2_y="e2f4_500nM"),
                   "E2f1 E2f3" = list(tf0_x="e2f4_500nM", tf0_y="e2f4_800nM", tf1_x="e2f1_250nM", tf2_y="e2f3_250nM"),
+                  "E2f3 E2f4" = list(tf0_x="e2f1_250nM", tf0_y="e2f1_200nM", tf1_x="e2f3_250nM", tf2_y="e2f4_500nM"),
                   "Mad1 c-Myc" = list(tf1_x="mad", tf1_y="madL", tf2_y="myc"),
+                  "Mad1 Max" = list(tf0_x="mad", tf0_y="madL", tf1_x="mad", tf2_y="max"),
+                  "Max c-Myc" = list(tf0_x="mad", tf0_y="madL", tf1_x="max", tf2_y="myc"),
                   "Runx1 Runx2" = list(tf1_x="runx1_10nM", tf1_y="runx1_50nM", tf2_y="runx2_10nM")
                   )
   return(labels)
