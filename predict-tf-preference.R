@@ -11,20 +11,20 @@ script.basename <- dirname(script.name)
 other.name <- paste(sep="/", script.basename, "Rcode/wls_functions.R")
 source(other.name)
 
-PREDICTION_COLUMN = 4 # 1-indexed column in the bed file where the fractional (0.0 - 1.0) scores are
+BED_COLUMNS=c("chrom","start","end","prediction")
 
 extract_scores <- function(bed_file) {
   # Read the bedfile as a table
-  bed_data <- read.table(bed_file, header=FALSE, stringsAsFactors = FALSE)
+  bed_data <- read.table(bed_file, header=FALSE, stringsAsFactors = FALSE, col.names=BED_COLUMNS)
   # Return only the scores from the prediction column
-  return(bed_data[, PREDICTION_COLUMN])
+  return(bed_data[, "prediction"])
 }
 
 write_preferences <- function(prefs, template_bedfile, output_file) {
   # Writes out a BED file with preferences. Starts by reading the template_bedfile
-  # and replaces the values in PREDICTION_COLUMN with prefs
-  bed_data <- read.table(template_bedfile, header=FALSE, stringsAsFactors = FALSE)
-  bed_data[, PREDICTION_COLUMN] = prefs
+  # and replaces the values in the prediction column with prefs
+  bed_data <- read.table(template_bedfile, header=FALSE, stringsAsFactors = FALSE, col.names=BED_COLUMNS)
+  bed_data[, "prediction"] = prefs
   write.table(bed_data, output_file, quote = F, col.names = F, row.names = F)
 }
 
@@ -106,5 +106,9 @@ scores.x = extract_scores(tf_predictions_1_bed_file)
 scores.y = extract_scores(tf_predictions_2_bed_file)
 data_fit = load_fit_data(family)
 res_varRep = calc_varRep(data_fit, labels)
-prefs = calc_prefs(data_fit, res_varRep, labels, scores)
+if(length(scores.x) != 0) {
+  prefs = calc_prefs(data_fit, res_varRep, labels, scores)
+} else {
+  prefs = scores.x # keep it empty
+}
 write_preferences(prefs, tf_predictions_1_bed_file, output_preferences_bed_file)
