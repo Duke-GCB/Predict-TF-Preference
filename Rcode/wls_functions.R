@@ -301,13 +301,7 @@ class_predTF <- function(tf1_x, tf2_y, scores_tf1, scores_tf2, t, sigma, plot = 
       }else{ # Assign preference to predicted values
         sd[i] <- sqrt(exp(2*t*Pred_matrix_combined$x[i])*sigma^2) # + exp(2*t_wls2*Pred_matrix_combined$x[i])*(sigma_wls2)^2*
         #                (1/n + (Pred_matrix_combined$x[i]-mean(Pred_matrix_combined$x))^2/((n-1)*var(Pred_matrix_combined$x))))
-        if(Pred_matrix_combined$y[i] < wls2_fun_l(Pred_matrix_combined$x[i])){
-          pref_score[i] <- (wls2_fun(Pred_matrix_combined$x[i]) - Pred_matrix_combined$y[i])/sd[i]   
-        } else{
-          if(Pred_matrix_combined$y[i] > wls2_fun_u(Pred_matrix_combined$x[i])){
-            pref_score[i] <- (wls2_fun(Pred_matrix_combined$x[i]) - Pred_matrix_combined$y[i])/sd[i]   
-          }
-        }
+        pref_score[i] <- (wls2_fun(Pred_matrix_combined$x[i]) - Pred_matrix_combined$y[i])/sd[i]
       }
     }
   }else{ #use linear model
@@ -317,13 +311,7 @@ class_predTF <- function(tf1_x, tf2_y, scores_tf1, scores_tf2, t, sigma, plot = 
       }else{ # Assign preference to predicted values
         sd[i] <- sqrt(exp(2*t*Pred_matrix_combined$x[i])*sigma^2) # + exp(2*t_wls1*Pred_matrix_combined$x[i])*(sigma_wls1)^2*
         #                (1/n + (Pred_matrix_combined$x[i]-mean(Pred_matrix_combined$x))^2/((n-1)*var(Pred_matrix_combined$x))))
-        if(Pred_matrix_combined$y[i] < wls1_fun_l(Pred_matrix_combined$x[i])){
-          pref_score[i] <- (wls1_fun(Pred_matrix_combined$x[i]) - Pred_matrix_combined$y[i])/sd[i]
-        } else{
-          if(Pred_matrix_combined$y[i] > wls1_fun_u(Pred_matrix_combined$x[i])){
-            pref_score[i] <- (wls1_fun(Pred_matrix_combined$x[i]) - Pred_matrix_combined$y[i])/sd[i]
-          }
-        }
+        pref_score[i] <- (wls1_fun(Pred_matrix_combined$x[i]) - Pred_matrix_combined$y[i])/sd[i]
       }
     }
   }
