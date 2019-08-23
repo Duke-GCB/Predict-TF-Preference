@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import csv
@@ -78,15 +78,15 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Filter preferences scores based on input prediction values and NegCtrl thresholds')
-    parser.add_argument('tf1_bedfile', type=argparse.FileType('rb'))
-    parser.add_argument('tf2_bedfile', type=argparse.FileType('rb'))
-    parser.add_argument('pref_bedfile', type=argparse.FileType('rb'))
+    parser.add_argument('tf1_bedfile', type=argparse.FileType('r'))
+    parser.add_argument('tf2_bedfile', type=argparse.FileType('r'))
+    parser.add_argument('pref_bedfile', type=argparse.FileType('r'))
     parser.add_argument('tf1_threshold', type=float)
     parser.add_argument('tf2_threshold', type=float)
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--spaces', action='store_const', const=b' ', dest='delimiter')
-    group.add_argument('--tabs', action='store_const', const=b'\t', dest='delimiter')
-    group.add_argument('--commas', action='store_const', const=b',', dest='delimiter')
+    group.add_argument('--spaces', action='store_const', const=' ', dest='delimiter')
+    group.add_argument('--tabs', action='store_const', const='\t', dest='delimiter')
+    group.add_argument('--commas', action='store_const', const=',', dest='delimiter')
     parser.add_argument_group()
     args = parser.parse_args()
     main(args)
